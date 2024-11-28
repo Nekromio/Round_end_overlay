@@ -14,7 +14,7 @@ public Plugin myinfo =
 	name = "Round end overlay",
 	author = "dataviruset (rewritten by Nek.'a 2x2 | ggwp.site )",
 	description = "Оверлей в конце раунда",
-	version = "1.2.3",
+	version = "1.2.4",
 	url = "https://ggwp.site/"
 };
 
@@ -46,25 +46,24 @@ public void OnMapStart()
 	}
 }
 
+void Event_RoundEnd(Event hEvent, const char[] sName, bool bDontBroadcast)
+{
+	int iWinTeam = hEvent.GetInt("winner");
+	if(iWinTeam == 2 && sOverlay[0][0]) ShowOverlayToAll(sOverlay[0]);
+	else if(iWinTeam == 3 && sOverlay[1][0]) ShowOverlayToAll(sOverlay[1]);
+}
+
+void Event_RoundStart(Event hEvent, const char[] sName, bool bDontBroadcast)
+{
+	ShowOverlayToAll("");
+}
+
 void ShowOverlayToAll(const char[] sOverlayAll)
 {
 	for(int i = 1; i <= MaxClients; i++) if(IsClientInGame(i) && !IsFakeClient(i)) ShowOverlayToClient(i, sOverlayAll);
 }
 
-void Event_RoundEnd(Handle hEvent, const char[] sName, bool bDontBroadcast)
+void ShowOverlayToClient(int client, const char[] sOverlayAll)
 {
-	int iWinTeam = GetEventInt(hEvent, "winner");
-
-	if(iWinTeam == 2 & sOverlay[0][0]) ShowOverlayToAll(sOverlay[0]);
-	else if(iWinTeam == 3 & sOverlay[1][0]) ShowOverlayToAll(sOverlay[1]);
-}
-
-void ShowOverlayToClient(int iClient, const char[] sOverlayAll)
-{
-	ClientCommand(iClient, "r_screenoverlay \"%s\"", sOverlayAll);
-}
-
-void Event_RoundStart(Handle hEvent, const char[] sName, bool bDontBroadcast)
-{
-	ShowOverlayToAll("");
+	ClientCommand(client, "r_screenoverlay \"%s\"", sOverlayAll);
 }
