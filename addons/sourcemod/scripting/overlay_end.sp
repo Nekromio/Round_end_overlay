@@ -12,15 +12,17 @@ public Plugin myinfo =
 	name = "Round end overlay",
 	author = "dataviruset (rewritten by Nek.'a 2x2 | ggwp.site )",
 	description = "Оверлей в конце раунда",
-	version = "1.2.5",
+	version = "1.2.6",
 	url = "https://ggwp.site/"
 };
 
 public void OnPluginStart()
 {
 	cvOverlay[0] = CreateConVar("sm_roundend_overlay_t", "overlays/game77seven/t_win", "Оверлей победы террористов");
-	
+	cvOverlay[0].AddChangeHook(OnOverlayChanged);
+
 	cvOverlay[1] = CreateConVar("sm_roundend_overlay_ct", "overlays/game77seven/ct_win", "Оверлей победы контр-террористов");
+	cvOverlay[1].AddChangeHook(OnOverlayChanged);
 
 	HookEvent("round_start", Event_RoundStart);
 	HookEvent("round_end", Event_RoundEnd);
@@ -28,7 +30,17 @@ public void OnPluginStart()
 	AutoExecConfig(true, "overlay_end");
 }
 
+public void OnOverlayChanged(ConVar convar,	const char[] oldValue,	const char[] newValue)
+{
+	LoadOverlays();
+}
+
 public void OnMapStart()
+{
+	LoadOverlays();
+}
+
+void LoadOverlays()
 {
 	char sBuffer[256];
 
@@ -37,7 +49,10 @@ public void OnMapStart()
 		cvOverlay[i].GetString(sBuffer, sizeof(sBuffer));
 
 		if(!sBuffer[0])
+		{
+			sOverlay[i][0] = '\0';
 			continue;
+		}	
 
 		ReplaceString(sBuffer, sizeof(sBuffer), "materials/", "", false);
 
@@ -73,6 +88,4 @@ void ShowOverlayToAll(const char[] sOverlayAll)
 void ShowOverlayToClient(int client, const char[] sOverlayAll)
 {
 	ClientCommand(client, "r_screenoverlay \"%s\"", sOverlayAll);
-	//
-	//PrintToChatAll("Игроку [%N] показан оверлей [%s]", client, sOverlayAll);
 }
