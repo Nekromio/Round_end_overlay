@@ -2,19 +2,17 @@
 #pragma newdecls required
 
 #include <sdktools_stringtables>
-#include <smartdm>
 
-ConVar
-	cvOverlay[2];
-char
-	sOverlay[2][256];
+ConVar cvOverlay[2];
+
+char sOverlay[2][256];
 	
 public Plugin myinfo =
 {
 	name = "Round end overlay",
 	author = "dataviruset (rewritten by Nek.'a 2x2 | ggwp.site )",
 	description = "Оверлей в конце раунда",
-	version = "1.2.4",
+	version = "1.2.5",
 	url = "https://ggwp.site/"
 };
 
@@ -33,16 +31,25 @@ public void OnPluginStart()
 public void OnMapStart()
 {
 	char sBuffer[256];
+
 	for(int i = 0; i < 2; i++)
 	{
 		cvOverlay[i].GetString(sBuffer, sizeof(sBuffer));
-		if(sBuffer[0])
-		{
-			sOverlay[i] = sBuffer;
-			PrecacheModel(sBuffer, true);
-			Format(sBuffer, sizeof(sBuffer), "materials/%s.vmt", sOverlay[i]);
-			Downloader_AddFileToDownloadsTable(sBuffer); 
-		}
+
+		if(!sBuffer[0])
+			continue;
+
+		ReplaceString(sBuffer, sizeof(sBuffer), "materials/", "", false);
+
+		sOverlay[i] = sBuffer;
+
+		PrecacheModel(sBuffer, true);
+
+		Format(sBuffer, sizeof(sBuffer), "materials/%s.vmt", sOverlay[i]);
+		AddFileToDownloadsTable(sBuffer);
+
+		Format(sBuffer, sizeof(sBuffer), "materials/%s.vtf", sOverlay[i]);
+		AddFileToDownloadsTable(sBuffer);
 	}
 }
 
@@ -66,4 +73,6 @@ void ShowOverlayToAll(const char[] sOverlayAll)
 void ShowOverlayToClient(int client, const char[] sOverlayAll)
 {
 	ClientCommand(client, "r_screenoverlay \"%s\"", sOverlayAll);
+	//
+	//PrintToChatAll("Игроку [%N] показан оверлей [%s]", client, sOverlayAll);
 }
